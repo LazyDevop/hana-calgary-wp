@@ -47,8 +47,8 @@ if [ "$BACKUP" = "yes" ] && [ -n "$(docker compose ps --status running -q wordpr
 	file="backups/db-$(date +%Y%m%d-%H%M%S)-${PREV_TAG:-none}.sql.gz"
 	log "Sauvegarde de la base → $file"
 	wp_cli db export - | gzip > "$file"
-	# garde les 14 dernières sauvegardes
-	ls -1t backups/db-*.sql.gz | tail -n +15 | xargs -r rm --
+	# garde les 14 dernières sauvegardes (noms horodatés : tri alphabétique = chronologique)
+	find backups -maxdepth 1 -name "db-*.sql.gz" | sort -r | tail -n +15 | xargs -r rm --
 fi
 
 set_tag "$NEW_TAG"
