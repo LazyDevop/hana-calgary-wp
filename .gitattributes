@@ -1,0 +1,5 @@
+# Scripts exécutés sous Linux : fins de ligne LF obligatoires
+*.sh text eol=lf
+*.yml text eol=lf
+Dockerfile text eol=lf
+docker/components.txt text eol=lf

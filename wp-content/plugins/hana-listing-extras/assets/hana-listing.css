@@ -1,0 +1,472 @@
+/* ========================================
+   HANA LISTING EXTRAS - STYLES
+   ======================================== */
+
+:root {
+    --hana-primary: #E8621A;
+    --hana-primary-dark: #C04E0E;
+    --hana-secondary: #2D9E6B;
+    --hana-bg: #FBF8F4;
+    --hana-text: #1A1A18;
+    --hana-muted: #7A6F68;
+    --hana-white: #FFFFFF;
+    --hana-border: rgba(232,98,26,.12);
+    --hana-radius: 14px;
+    --hana-shadow: 0 8px 40px rgba(0,0,0,.08);
+    --hana-shadow-lg: 0 12px 48px rgba(0,0,0,.12);
+    --hana-transition: .35s cubic-bezier(.25,.8,.25,1);
+}
+
+.hana-share-section,
+.hana-contact-section,
+.hana-reviews-section {
+    margin: 40px 0;
+    padding: 30px;
+    background: var(--hana-white);
+    border-radius: var(--hana-radius);
+    box-shadow: var(--hana-shadow);
+    border: 1px solid var(--hana-border);
+}
+
+.hana-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--hana-text);
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hana-share-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.hana-share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--hana-transition);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.hana-share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+.hana-btn-contact,
+.hana-btn-review,
+.hana-btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--hana-primary) 0%, var(--hana-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--hana-transition);
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+}
+
+.hana-btn-contact:hover,
+.hana-btn-review:hover,
+.hana-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(232, 98, 26, 0.35);
+}
+
+.hana-btn-review {
+    background: linear-gradient(135deg, var(--hana-secondary) 0%, #1e7e5a 100%);
+    margin-bottom: 20px;
+}
+
+.hana-modal {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.hana-modal.active {
+    display: flex;
+}
+
+.hana-modal-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.hana-modal-content {
+    background: white;
+    border-radius: var(--hana-radius);
+    padding: 35px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--hana-shadow-lg);
+    animation: hanaSlideUp 0.3s ease;
+    margin: 20px;
+}
+
+@keyframes hanaSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hana-modal-close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    color: var(--hana-muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: var(--hana-transition);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.hana-modal-close:hover {
+    color: var(--hana-primary);
+    background: var(--hana-bg);
+    transform: rotate(90deg);
+}
+
+.hana-modal-subtitle {
+    color: var(--hana-muted);
+    font-size: 14px;
+    margin: -15px 0 20px 0;
+}
+
+.hana-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hana-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hana-form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hana-text);
+}
+
+.hana-form-group input,
+.hana-form-group textarea,
+.hana-form-group select {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: var(--hana-transition);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.hana-form-group input:focus,
+.hana-form-group textarea:focus {
+    outline: none;
+    border-color: var(--hana-primary);
+    box-shadow: 0 0 0 3px rgba(232, 98, 26, 0.1);
+}
+
+.hana-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.hana-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--hana-muted);
+}
+
+.hana-checkbox input {
+    margin-top: 2px;
+}
+
+.hana-form-message {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+}
+
+.hana-form-message.success {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.hana-form-message.error {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.hana-star-rating {
+    display: flex;
+    gap: 4px;
+}
+
+.hana-star-rating .hana-star {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #ddd;
+    cursor: pointer;
+    transition: var(--hana-transition);
+    padding: 0;
+    line-height: 1;
+}
+
+.hana-star-rating .hana-star:hover,
+.hana-star-rating .hana-star.active {
+    color: #f5a524;
+}
+
+.hana-star-rating.mini .hana-star {
+    font-size: 18px;
+}
+
+.hana-rating-average {
+    background: var(--hana-primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.hana-rating-stars {
+    color: #f5a524;
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+.hana-rating-count {
+    color: var(--hana-muted);
+    font-size: 14px;
+}
+
+.hana-reviews-intro {
+    color: var(--hana-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.hana-login-notice {
+    background: var(--hana-bg);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    color: var(--hana-muted);
+}
+
+.hana-login-notice a {
+    color: var(--hana-primary);
+    font-weight: 600;
+}
+
+.hana-review-card {
+    background: var(--hana-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: var(--hana-transition);
+}
+
+.hana-review-card:hover {
+    box-shadow: var(--hana-shadow);
+}
+
+.hana-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.hana-review-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hana-review-author img {
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.hana-review-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.hana-review-badge.verified {
+    background: #d4edda;
+    color: #155724;
+}
+
+.hana-review-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.hana-review-meta {
+    text-align: right;
+}
+
+.hana-review-date {
+    display: block;
+    color: var(--hana-muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.hana-review-categories {
+    display: flex;
+    gap: 15px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+}
+
+.hana-review-cat {
+    background: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--hana-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.hana-review-content {
+    color: var(--hana-text);
+    line-height: 1.7;
+    margin: 12px 0;
+}
+
+.hana-review-pros,
+.hana-review-cons {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.hana-review-pros {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.hana-review-cons {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.hana-no-reviews {
+    text-align: center;
+    color: var(--hana-muted);
+    padding: 40px;
+    font-style: italic;
+}
+
+.hana-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--hana-text);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.hana-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .hana-share-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .hana-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .hana-modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    .hana-review-header {
+        flex-direction: column;
+    }
+    
+    .hana-review-meta {
+        text-align: left;
+    }
+}

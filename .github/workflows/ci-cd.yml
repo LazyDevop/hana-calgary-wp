@@ -1,0 +1,135 @@
+# CI/CD HANA Calgary
+#   pull request      → vérifications + construction de l'image (sans publication)
+#   push sur main     → vérifications + image + déploiement STAGING (dev.hanacalgary.ca)
+#   tag vX.Y.Z        → vérifications + image + déploiement PRODUCTION (www.hanacalgary.ca)
+#
+# Réglages à créer dans GitHub (Settings → Environments → staging / production) :
+#   variables : SSH_HOST, SSH_USER, DEPLOY_DIR, SITE_URL
+#   secrets   : SSH_PRIVATE_KEY, SSH_KNOWN_HOSTS
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Vérifications
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntaxe PHP (PHP 8.2, comme en production)
+        run: |
+          docker run --rm -v "$PWD:/app" -w /app php:8.2-cli \
+            sh -c 'find wp-content docker -name "*.php" -print0 | xargs -0 -n1 php -l'
+
+      - name: Scripts shell
+        run: shellcheck deploy/remote-deploy.sh docker/fetch-components.sh .github/scripts/ssh-deploy.sh
+
+      - name: Aucun secret dans le dépôt
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$|\.sql(\.gz)?$|id_(rsa|ed25519)'; then
+            echo "::error::Fichier sensible versionné (voir ci-dessus)"; exit 1
+          fi
+
+  image:
+    name: Image Docker
+    needs: checks
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.vars.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Nom et tag de l'image
+        id: vars
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Connexion à ghcr.io
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construction (et publication hors pull request)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: GIT_SHA=${{ github.sha }}
+          tags: |
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.tag }}
+            ${{ github.ref == 'refs/heads/main' && format('{0}:main', steps.vars.outputs.image) || '' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Déploiement staging
+    if: github.ref == 'refs/heads/main'
+    needs: image
+    runs-on: ubuntu-24.04
+    environment:
+      name: staging
+      url: ${{ vars.SITE_URL }}
+    concurrency: { group: deploy-staging, cancel-in-progress: false }
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Déployer
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          TARGET: ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}
+          DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          TAG: ${{ needs.image.outputs.tag }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/ssh-deploy.sh no
+
+  deploy-production:
+    name: Déploiement production
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: image
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    concurrency: { group: deploy-production, cancel-in-progress: false }
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Déployer (avec sauvegarde de la base)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          TARGET: ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}
+          DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          TAG: ${{ needs.image.outputs.tag }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/ssh-deploy.sh yes

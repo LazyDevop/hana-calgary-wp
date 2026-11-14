@@ -1,0 +1,32 @@
+# Composants tiers installés dans l'image, téléchargés depuis wordpress.org.
+# Format : <type> <slug> <version>      (type = plugin | theme)
+#
+# Pour mettre à jour un plugin : changer la version ici, ouvrir une pull request,
+# vérifier sur le staging, puis créer un tag de version pour la production.
+# Les mises à jour depuis l'admin WordPress sont désactivées (DISALLOW_FILE_MODS) :
+# elles seraient perdues au déploiement suivant.
+
+theme  kadence                  1.5.0
+
+plugin code-snippets            3.9.6
+plugin imagify                  2.3.0
+plugin kadence-blocks           3.7.8
+plugin polylang                 3.8.6
+plugin seo-by-rank-math         1.0.274.1
+plugin tinymce-advanced         5.9.2
+plugin widget-options           4.2.5
+plugin wordfence                8.2.2
+plugin wp-mail-smtp             4.9.0
+plugin wpcasa                   1.5.3
+plugin wpcasa-advanced-search   1.1.1
+plugin wpcasa-list-agents       1.1.0
+plugin wpcasa-polylang          1.2.1
+plugin wpforms-lite             2.0.0.2
+
+# Présents sur le site actuel, mais à NE PAS garder en production
+# (outils de migration / débogage = surface d'attaque). Décommenter si besoin.
+# plugin all-in-one-wp-migration  7.107
+# plugin better-search-replace    1.4.11
+# plugin duplicator               1.5.16.1
+# plugin query-monitor            4.0.7
+# plugin litespeed-cache          7.8.1     (inutile : le serveur est Apache, pas LiteSpeed)

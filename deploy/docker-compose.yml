@@ -1,0 +1,59 @@
+# Déploiement HANA Calgary sur le VPS — un dossier par environnement :
+#   /opt/hana/staging/     (docker-compose.yml + .env)  → dev.hanacalgary.ca
+#   /opt/hana/production/  (docker-compose.yml + .env)  → www.hanacalgary.ca
+# Le proxy HTTPS existant du VPS redirige le domaine vers 127.0.0.1:${HTTP_PORT}.
+
+name: hana-${HANA_ENV:?HANA_ENV manquant dans .env}
+
+services:
+  wordpress:
+    image: ghcr.io/lazydevop/hana-calgary-wp:${IMAGE_TAG:?IMAGE_TAG manquant dans .env}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WP_HOME: ${WP_HOME}
+      WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE}
+      WP_DEBUG: ${WP_DEBUG:-false}
+      HANA_MAIL_DISABLED: ${HANA_MAIL_DISABLED:-0}
+      WPMS_SMTP_PASS: ${WPMS_SMTP_PASS:-}
+      WORDPRESS_AUTH_KEY: ${WORDPRESS_AUTH_KEY}
+      WORDPRESS_SECURE_AUTH_KEY: ${WORDPRESS_SECURE_AUTH_KEY}
+      WORDPRESS_LOGGED_IN_KEY: ${WORDPRESS_LOGGED_IN_KEY}
+      WORDPRESS_NONCE_KEY: ${WORDPRESS_NONCE_KEY}
+      WORDPRESS_AUTH_SALT: ${WORDPRESS_AUTH_SALT}
+      WORDPRESS_SECURE_AUTH_SALT: ${WORDPRESS_SECURE_AUTH_SALT}
+      WORDPRESS_LOGGED_IN_SALT: ${WORDPRESS_LOGGED_IN_SALT}
+      WORDPRESS_NONCE_SALT: ${WORDPRESS_NONCE_SALT}
+    volumes:
+      # Seules données persistantes côté WordPress : les médias.
+      - ${UPLOADS_DIR:-./data/uploads}:/var/www/html/wp-content/uploads
+    ports:
+      - "127.0.0.1:${HTTP_PORT}:80"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - ${DB_DIR:-./data/mysql}:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
